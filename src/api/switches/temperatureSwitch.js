@@ -25,14 +25,14 @@ class TemperatureSwitch {
                 return;
             }
 
-            await this.recoveryTemperatureManager(value, control);
-            await this.adaptiveTemperatureManager(value, control);
+            await this.recoveryTemperatureRunner(value, control);
+            await this.adaptiveTemperatureRunner(value, control);
 
             this.logger.log(`temperature: ${value}, target: ${control.targetTemp}`);
         })
     }
 
-    async recoveryTemperatureManager(temperature, control) {
+    async recoveryTemperatureRunner(temperature, control) {
         if (temperature >= control.recoveryMaxTemp && !this.recovering) {
             this.recovering = true;
             this.clearAdaptiveTimer();
@@ -49,7 +49,7 @@ class TemperatureSwitch {
         }
     }
 
-    async adaptiveTemperatureManager(temperature, control) {
+    async adaptiveTemperatureRunner(temperature, control) {
         if (this.recovering) {
             return;
         }

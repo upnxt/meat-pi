@@ -1,6 +1,6 @@
-const ds18b20 = require("ds18b20");
+const sensor = require("rpi-dht-sensor");
 
-class TemperatureController {
+class HumiditySensor {
     constructor(bus, db, logger, type, stateManager) {
         this.bus = bus;
         this.db = db;
@@ -14,7 +14,7 @@ class TemperatureController {
         return state;
     }
 
-    async getTemp() {
+    async getHumidity() {
         try {
             const control = await this.db.get(this.type);
             return control.value;
@@ -22,15 +22,6 @@ class TemperatureController {
             this.logger.log(ex);
             return 0;
         }
-    }
-
-    async update(obj) {
-        let control = await this.db.get(this.type);
-        await this.db.put({
-            _id: this.type,
-            _rev: control._rev,
-            ...obj
-        });
     }
 
     async poll() {
@@ -43,17 +34,20 @@ class TemperatureController {
         //poll
         setInterval(async () => {
             let control = await this.db.get(this.type);
-            const temp = ds18b20.temperatureSync(control.deviceId);
+
+            const dht = new sensor.DHT22(control.gpio);
+            const readout = dht.read();
+            const humidity = readout.humidity;
             
-            if (temp == control.value)
+            if (humidity == control.value)
                 return;
 
-            control.value = temp;
+            control.value = humidity;
 
             await this.db.put(control);
-            this.bus.emit("temperature:change", control.value);
+            this.bus.emit("humidity:change", control.value);
         }, 1000);
     }
 }
 
-module.exports = TemperatureController;
+module.exports = HumiditySensor;

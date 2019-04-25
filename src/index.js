@@ -12,10 +12,10 @@ const ConsoleLogger = require("./infrastructure/logging/console");
 //managers
 const SwitchStateManager = require("./api/managers/state/switchStateManager");
 
-//controlls
+//controls
 const FanController = require("./api/controls/fanController");
-const HumidityController = require("./api/controls/humidityController");
-const TemperatureController = require("./api/controls/temperatureController");
+const HumiditySensor = require("./api/controls/humiditySensor");
+const TemperatureSensor = require("./api/controls/temperatureSensor");
 
 //switches
 const FanSwitch = require("./api/switches/fanSwitch");
@@ -34,20 +34,20 @@ const init = async () => {
     const fanSwitch = new FanSwitch(bus, logger, fanStateManger);
 
     const humidityStateManager = new SwitchStateManager(db, "humidity");
-    const humidityController = new HumidityController(bus, db, logger, "humidity", humidityStateManager);
+    const humiditySensor = new HumiditySensor(bus, db, logger, "humidity", humidityStateManager);
     const humiditySwitch = new HumiditySwitch(bus, db, logger, "humidity", humidityStateManager);
 
     const temperatureStateManager = new SwitchStateManager(db, "temperature");
-    const temperatureController = new TemperatureController(bus, db, logger, "temperature", temperatureStateManager);
+    const temperatureSensor = new TemperatureSensor(bus, db, logger, "temperature", temperatureStateManager);
     const temperatureSwitch = new TemperatureSwitch(bus, db, logger, "temperature", temperatureStateManager);
 
     //start listeners
-    humiditySwitch.listen();
-    temperatureSwitch.listen();
+    await humiditySwitch.listen();
+    await temperatureSwitch.listen();
 
     //start sensor polling and eventing
-    await humidityController.poll();
-    await temperatureController.poll();
+    await humiditySensor.poll();
+    await temperatureSensor.poll();
 
     const server = Hapi.server({
         port: 3000,
@@ -72,14 +72,14 @@ const init = async () => {
     await server.register({
         plugin: require("./api/plugins/humidity"),
         options: {
-            humidityController: humidityController
+            humiditySensor: humiditySensor
         }
     });
 
     await server.register({
         plugin: require("./api/plugins/temperature"),
         options: {
-            temperatureController: temperatureController
+            temperatureSensor: temperatureSensor
         }
     });
 

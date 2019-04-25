@@ -4,7 +4,7 @@ exports.plugin = {
   name: "humidityPlugin",
   version: "1.0.0",
   register: async function(server, options) {
-    const control = options.humidityController;
+    const control = options.humiditySensor;
 
     //status
     server.route({
