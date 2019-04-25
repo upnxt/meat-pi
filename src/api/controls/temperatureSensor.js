@@ -5,7 +5,7 @@ class TemperatureSensor {
         this.bus = bus;
         this.db = db;
         this.logger = logger;
-        this.type = type;        
+        this.type = type;
         this.stateManager = stateManager;
     }
 
@@ -26,7 +26,7 @@ class TemperatureSensor {
 
     async update(obj) {
         let control = await this.db.get(this.type);
-        await this.db.put({
+        await this.db.update({
             _id: this.type,
             _rev: control._rev,
             ...obj
@@ -38,19 +38,20 @@ class TemperatureSensor {
         let control = await this.db.get(this.type);
         control.value = 0;
 
-        await this.db.put(control);
+        await this.db.update(control);
 
         //poll
         setInterval(async () => {
             let control = await this.db.get(this.type);
             const temp = ds18b20.temperatureSync(control.deviceId);
-            
-            if (temp == control.value)
+
+            if (temp == control.value) {
                 return;
+            }
 
             control.value = temp;
 
-            await this.db.put(control);
+            await this.db.update(control);
             this.bus.emit("temperature:change", control.value);
         }, 1000);
     }

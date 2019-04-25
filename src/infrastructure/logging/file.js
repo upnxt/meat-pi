@@ -1,9 +1,7 @@
 const simpleLogger = require("simple-node-logger");
 
 class FileLogger {
-    log(message) {
-        
-    }
+    log(message) {}
 }
 
 module.exports = FileLogger;

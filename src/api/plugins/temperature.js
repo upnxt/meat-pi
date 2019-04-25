@@ -45,11 +45,11 @@ exports.plugin = {
         });
 
         function formattedFahrenheit(temp) {
-            return ((temp * 9) / 5 + 32).toFixed(2) + "F";
+            return ((temp * 9) / 5 + 32).toFixed(1);
         }
 
         function formattedCelsius(temp) {
-            return temp.toFixed(2) + "C";
+            return temp.toFixed(1);
         }
     }
 };

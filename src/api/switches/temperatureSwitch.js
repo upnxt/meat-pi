@@ -19,8 +19,7 @@ class TemperatureSwitch {
             const control = await this.db.get(this.type);
 
             //manually disabled the control via config, return early
-            if (!control.switch.enabled)
-            {
+            if (!control.switch.enabled) {
                 this.stateManager.setOff();
                 return;
             }
@@ -28,8 +27,8 @@ class TemperatureSwitch {
             await this.recoveryTemperatureRunner(value, control);
             await this.adaptiveTemperatureRunner(value, control);
 
-            this.logger.log(`temperature: ${value}, target: ${control.targetTemp}`);
-        })
+            this.logger.log(`[switch] temperature: ${value}, target: ${control.targetTemp}`);
+        });
     }
 
     async recoveryTemperatureRunner(temperature, control) {
@@ -38,14 +37,14 @@ class TemperatureSwitch {
             this.clearAdaptiveTimer();
             this.turnon(control.switch.gpio);
 
-            this.logger.log(`RECOVERY STARTED. temp: ${temperature}`);
+            this.logger.log(`[switch] RECOVERY STARTED. temp: ${temperature}`);
         }
 
         if (temperature <= control.targetTemp && this.recovering) {
             this.shutoff(control.switch.gpio);
             this.recovering = false;
 
-            this.logger.log(`RECOVERY COMPLETE. temp: ${temperature}`);
+            this.logger.log(`[switch] RECOVERY COMPLETE. temp: ${temperature}`);
         }
     }
 
@@ -92,7 +91,7 @@ class TemperatureSwitch {
                         additionalCoolingTime += ((difference - 0.5) / 0.1) * control.residualCoolingMultiplier;
                     }
 
-                    this.logger.log(`freezer cooling for: ${control.initialCoolingTimeout + additionalCoolingTime} seconds, difference: ${difference}`);
+                    this.logger.log(`[switch] chamber cooling for: ${control.initialCoolingTimeout + additionalCoolingTime} seconds, difference: ${difference}`);
 
                     this.coolerTimer = setTimeout(async () => {
                         await this.shutoff(control.switch.gpio);
@@ -122,4 +121,4 @@ class TemperatureSwitch {
     }
 }
 
-module.exports = TemperatureSwitch
+module.exports = TemperatureSwitch;

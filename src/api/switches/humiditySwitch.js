@@ -7,6 +7,8 @@ class HumditySwitch {
         this.logger = logger;
         this.type = type;
         this.stateManager = stateManager;
+
+        this.turnedOn = false;
     }
 
     async listen() {
@@ -14,8 +16,7 @@ class HumditySwitch {
             const control = await this.db.get(this.type);
 
             //manually disabled the control via config, return early
-            if (!control.switch.enabled)
-            {
+            if (!control.switch.enabled) {
                 this.stateManager.setOff();
                 return;
             }
@@ -25,16 +26,16 @@ class HumditySwitch {
                     rpio.open(control.switch.gpio, rpio.OUTPUT, rpio.LOW);
                 });
             }
-    
+
             if (value > control.targetHumidity) {
                 await this.stateManager.setOff(() => {
                     rpio.open(control.switch.gpio, rpio.OUTPUT, rpio.HIGH);
                 });
             }
 
-            this.logger.log(`humidity: ${value}, target: ${control.targetHumidity}, state: ${await this.stateManager.state()}`);
-        })
+            this.logger.log(`[switch] humidity: ${value}, target: ${control.targetHumidity}, state: ${await this.stateManager.state()}`);
+        });
     }
 }
 
-module.exports = HumditySwitch
+module.exports = HumditySwitch;

@@ -8,14 +8,14 @@ class FanSwitch {
     async listen() {
         this.bus.on("fan:start", (value) => {
             this.stateManager.setOn();
-            this.logger.log("fan started");
+            this.logger.log("[switch] fan started");
         });
 
         this.bus.on("fan:stop", (value) => {
             this.stateManager.setOff();
-            this.logger.log("fan stopped");
+            this.logger.log("[switch] fan stopped");
         });
     }
 }
 
-module.exports = FanSwitch
+module.exports = FanSwitch;

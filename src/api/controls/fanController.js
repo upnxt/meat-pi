@@ -1,10 +1,9 @@
-
 class FanController {
     constructor(bus, db, logger, type, stateManager) {
         this.bus = bus;
         this.db = db;
         this.logger = logger;
-        this.type = type;        
+        this.type = type;
         this.stateManager = stateManager;
     }
 
@@ -22,8 +21,7 @@ class FanController {
             setTimeout(() => {
                 this.bus.emit("fan:stop");
             }, 1000 * runFor);
-
-        }, 1000 * control.runInterval)
+        }, 1000 * control.runInterval);
     }
 }
 

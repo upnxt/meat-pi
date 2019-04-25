@@ -5,7 +5,7 @@ class HumiditySensor {
         this.bus = bus;
         this.db = db;
         this.logger = logger;
-        this.type = type;        
+        this.type = type;
         this.stateManager = stateManager;
     }
 
@@ -29,24 +29,25 @@ class HumiditySensor {
         let control = await this.db.get(this.type);
         control.value = 0;
 
-        await this.db.put(control);
+        await this.db.update(control);
 
-        //poll
+        //dht22 doesn't update very often, poll at a minimum of every 5 seconds
         setInterval(async () => {
             let control = await this.db.get(this.type);
 
             const dht = new sensor.DHT22(control.gpio);
             const readout = dht.read();
             const humidity = readout.humidity;
-            
-            if (humidity == control.value)
+
+            if (humidity == control.value || Math.abs(humidity - control.value) < 0.25) {
                 return;
+            }
 
             control.value = humidity;
 
-            await this.db.put(control);
+            await this.db.update(control);
             this.bus.emit("humidity:change", control.value);
-        }, 1000);
+        }, 1000 * 10);
     }
 }
 

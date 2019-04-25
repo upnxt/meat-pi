@@ -1,37 +1,48 @@
-1. apt-get install nodejs
-1. apt-get install npm
-1. npm install -g n
-1. n lts
-1. n --version
-1. node -v
-1. sudo node -v
-1. install http://www.airspayce.com/mikem/bcm2835/
+# Dependency setup
 
-    sudo apt-get install html-xml-utils
-    mkdir -p bcm2835 && (wget -qO - `curl -sL http://www.airspayce.com/mikem/bcm2835 | hxnormalize -x -e | hxselect -s '\n' -c "div.textblock>p:nth-child(4)>a:nth-child(1)"` | tar xz --strip-components=1 -C bcm2835 )
-    cd bcm2835
-    ./configure
-    make
-    sudo make install
+Install nodejs and npm
 
-1. add user who will run the node site(s) to the gpio group
+> apt-get install nodejs npm
 
-    > sudo adduser pi gpio
+Install a node version manager
 
-1. sudo raspi-config
+> npm install -g n
+> n lts
 
-Go to Interfaces and then to 1-Wire and enable it and reboot the device.
+Check to make sure n actually worked
 
-1. make sure the ds18b20 has a resister from 5v to the gpio pin then follow instructions here http://www.circuitbasics.com/raspberry-pi-ds18b20-temperature-sensor-tutorial/
+> n --version
+> node -v
+> sudo node -v
 
--to start on restart of system
-nano /etc/rc.local
+The ds18b20 temperature guage is dependent on the BCM2835 library (http://www.airspayce.com/mikem/bcm2835/)
 
-    #start api posting script
-    sudo node /home/pi/scripts/temp_controller/api.js &
+> sudo apt-get install html-xml-utils
+> mkdir -p bcm2835 && (wget -qO - `curl -sL http://www.airspayce.com/mikem/bcm2835 | hxnormalize -x -e | hxselect -s '\n' -c "div.textblock>p:nth-child(4)>a:nth-child(1)"` | tar xz --strip-components=1 -C bcm2835 )
+> cd bcm2835
+> ./configure
+> make
+> sudo make install
 
-    #start local web interface
+Add user who will run the node site(s) to the gpio group
+
+> sudo adduser pi gpio
+
+Enable 1-Wire devices
+
+> sudo raspi-config
+> Go to Interfaces, then 1-Wire and select "enable"
+
+Make sure the ds18b20 temperature guage has a resister from 5v to the gpio pin then follow instructions here http://www.circuitbasics.com/raspberry-pi-ds18b20-temperature-sensor-tutorial/
+
+# Start the site on restart of the system
+
+> nano /etc/rc.local
+
+> #start local web interface
+
     sudo node /home/pi/scripts/temp_controller/dashboard.js &
 
--   to start manually
-    sudo node dashboard.js
+# Start the site manually
+
+> sudo node src/index.js

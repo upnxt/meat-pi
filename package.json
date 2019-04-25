@@ -4,18 +4,43 @@
     "description": "curing chamber / homebrew controller",
     "main": "index.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "webpack --watch --progress --hide-modules",
+        "release": "cross-env NODE_ENV=production webpack --hide-modules"
     },
     "author": "",
     "license": "ISC",
     "devDependencies": {
+        "babel-core": "^6.26.0",
+        "babel-loader": "^7.1.2",
+        "babel-plugin-transform-runtime": "^6.23.0",
+        "babel-preset-env": "^1.6.0",
+        "babel-preset-es2015": "^6.24.1",
+        "babel-preset-stage-3": "^6.24.1",
+        "chart.js": "^2.8.0",
+        "cross-env": "^5.0.5",
+        "css-loader": "^0.28.7",
         "ds18b20": "^0.1.0",
+        "extract-text-webpack-plugin": "^3.0.2",
+        "file-loader": "^1.1.4",
         "hapi": "^18.1.0",
+        "inert": "^5.1.3",
+        "less": "^3.9.0",
+        "less-loader": "^4.1.0",
         "pouchdb-adapter-memory": "^7.0.0",
         "pouchdb-node": "^7.0.0",
         "rpi-dht-sensor": "^0.1.1",
         "rpio": "^1.0.13",
-        "simple-node-logger": "^18.12.22"
+        "simple-node-logger": "^18.12.22",
+        "style-loader": "^0.19.1",
+        "vue": "^2.6.10",
+        "vue-chartjs": "^3.4.2",
+        "vue-loader": "11.1.4",
+        "vue-resource": "^1.3.4",
+        "vue-style-loader": "^3.0.3",
+        "vue-template-compiler": "^2.4.4",
+        "webpack": "^3.6.0",
+        "webpack-dev-server": "^2.9.1"
     },
     "dependencies": {}
 }

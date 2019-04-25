@@ -1,11 +1,11 @@
-const db = require("../localstore");
+const localstore = require("../localstore");
 
 async function controlsUp() {
     //temp control seed
     try {
-        await db.get("temperature");
+        await localstore.get("temperature");
     } catch (ex) {
-        await db.put({
+        await localstore.put({
             _id: "temperature",
             gpio: 7,
             deviceId: "28-0316859573ff",
@@ -23,9 +23,9 @@ async function controlsUp() {
 
     //humidity control seed
     try {
-        await db.get("humidity");
+        await localstore.get("humidity");
     } catch (ex) {
-        await db.put({
+        await localstore.put({
             _id: "humidity",
             gpio: 2,
             targetHumidity: 74,
@@ -39,9 +39,9 @@ async function controlsUp() {
 
     //fan control seed
     try {
-        await db.get("fan");
+        await localstore.get("fan");
     } catch (ex) {
-        await db.put({
+        await localstore.put({
             _id: "fan",
             runFor: 120,
             runInterval: 21600,

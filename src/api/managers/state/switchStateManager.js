@@ -23,7 +23,7 @@ class SwitchStateManager {
         let control = await this.db.get(this.type);
         control.switch.state = state;
 
-        await this.db.put(control);
+        await this.db.update(control);
 
         if (typeof callback === "function") {
             callback();
