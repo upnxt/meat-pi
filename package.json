@@ -1,0 +1,21 @@
+{
+    "name": "meat-pi",
+    "version": "1.0.0",
+    "description": "curing chamber / homebrew controller",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "ds18b20": "^0.1.0",
+        "hapi": "^18.1.0",
+        "pouchdb-adapter-memory": "^7.0.0",
+        "pouchdb-node": "^7.0.0",
+        "rpi-dht-sensor": "^0.1.1",
+        "rpio": "^1.0.13",
+        "simple-node-logger": "^18.12.22"
+    },
+    "dependencies": {}
+}
