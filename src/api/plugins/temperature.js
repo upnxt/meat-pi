@@ -4,7 +4,7 @@ exports.plugin = {
     name: "temperaturePlugin",
     version: "1.0.0",
     register: async function(server, options) {
-        const control = options.temperatureController;
+        const control = options.temperatureSensor;
 
         //status
         server.route({
