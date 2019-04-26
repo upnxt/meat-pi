@@ -13,6 +13,7 @@ async function controlsUp() {
             recoveryMaxTemp: 24,
             initialCoolingTimeout: 60,
             residualCoolingMultiplier: 6,
+            history: [],
             switch: {
                 enabled: 1,
                 gpio: 13,
@@ -29,6 +30,7 @@ async function controlsUp() {
             _id: "humidity",
             gpio: 2,
             targetHumidity: 74,
+            history: [],
             switch: {
                 enabled: 1,
                 gpio: 3,
@@ -45,6 +47,7 @@ async function controlsUp() {
             _id: "fan",
             runFor: 120,
             runInterval: 21600,
+            history: [],
             switch: {
                 enabled: 1,
                 gpio: 0,

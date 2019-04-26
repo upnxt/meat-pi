@@ -24,13 +24,20 @@ class TemperatureSensor {
         }
     }
 
+    async getHistory() {
+        try {
+            const control = await this.db.get(this.type);
+            return control.history;
+        }
+        catch(ex) {
+            this.logger.log(ex);
+            return [];
+        }
+    }
+
     async update(obj) {
         let control = await this.db.get(this.type);
-        await this.db.update({
-            _id: this.type,
-            _rev: control._rev,
-            ...obj
-        });
+        await this.db.update(control);
     }
 
     async poll() {
@@ -50,6 +57,22 @@ class TemperatureSensor {
             }
 
             control.value = temp;
+
+            //no need to log excessively if we're only displaying the last few entries in the ui
+            let pushHistory = true;
+
+            if (control.history.length > 0) {
+                const diff = Math.abs(new Date(control.history[control.history.length - 1].timestamp) - new Date());
+                const minutes = Math.floor((diff/1000)/60);
+                if (minutes < 30)
+                    pushHistory = false;
+            }
+
+            if (pushHistory)
+                control.history.push({ value: control.value, timestamp: new Date() });
+
+            if (control.history.length > 100)
+                control.history = control.history.splice(control.history.length - 100);
 
             await this.db.update(control);
             this.bus.emit("temperature:change", control.value);

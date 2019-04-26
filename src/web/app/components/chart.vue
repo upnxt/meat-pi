@@ -54,11 +54,11 @@ export default {
     this.renderChart(this.chartdata, this.options);
 
     bus.$on(this.evt, data => {
-      this.chartdata.labels = data.map(v => {
-        return v + this.label;
+      this.chartdata.labels = data.map(m => {
+        return m.value + this.label +", "+ m.timestamp;
       });
 
-      this.chartdata.datasets[0].data = data;
+      this.chartdata.datasets[0].data = data.map((m) => m.value);
       this.$data._chart.update();
     });
   }

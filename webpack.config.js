@@ -15,6 +15,7 @@ module.exports = {
         filename: "./js/[name].bundle.js"
     },
     plugins: [
+        new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
         new webpack.IgnorePlugin(/^electron$/),
         new webpack.optimize.CommonsChunkPlugin({ name: "vendor", filename: "./js/vendor.bundle.js" }),
         new ExtractTextPlugin({ filename: "./css/site.bundle.css" })

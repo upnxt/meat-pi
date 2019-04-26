@@ -22,10 +22,10 @@ const init = async () => {
     console.log("Server running on %ss", server.info.uri);
 };
 
-process.on("unhandledRejection", (err) => {
+process.on("unhandledRejection", async (err) => {
     console.log(err);
 
-    dbsync.replicateToDisk(true);
+    await dbsync.replicateToDisk(true);
     db.destroy();
     localstore.close();
 

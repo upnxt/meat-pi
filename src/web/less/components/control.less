@@ -1,0 +1,52 @@
+.control {
+    display: flex;
+    background: #f1f1f1;
+    // border: 0.1em solid #0c0c0c;
+    border-radius: 0.5em;
+    padding: 2em;
+    margin: 2em;
+    box-shadow: 7px 7px 14px -6px rgba(11,17,77,1);
+
+    .reading {
+        min-width: 15em;
+        padding: 0.5em 0.5em 0 0.5em;
+
+        header {
+            display: block;
+            position: relative;
+
+            h4 {
+                margin: 0;
+            }
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 3.75em;
+            margin: 0.65em 0 0.45em 0;
+
+            sup {
+                font-size: 50%;
+                top: -0.75em;
+                padding-left: .10em;
+            }
+        }
+
+        footer {
+            display: block;
+            color: #999;
+            text-align: right;
+        }
+    }
+
+    .chart {
+        margin-left: 3em;
+        width: 100%;
+
+        & > div {
+            max-height: 180px;
+            width: 100%;
+            position: relative;
+        }
+    }
+}

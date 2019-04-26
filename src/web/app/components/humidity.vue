@@ -4,11 +4,11 @@
       <header>
         <h4>Humidity</h4>
         <span
-          :class="['status', state]"
+          :class="['state', state]"
           :title="state"
         ></span>
       </header>
-      <h1>{{h}}%</h1>
+      <h1>{{h}}<sup>%</sup></h1>
     </div>
     <div class="chart">
       <chart
@@ -22,11 +22,13 @@
 <script>
 import chart from "./chart.vue";
 import bus from "../bus";
+import parseState from "../utils/stateParser";
+import manageHistory from "../utils/historyManager";
 
 export default {
   data() {
     return {
-      values: [0],
+      values: [],
       state: "disabled",
       h: -1
     };
@@ -38,18 +40,9 @@ export default {
     poll() {
       this.$http.get("http://192.168.0.18:3000/api/humidity").then(
         response => {
-          this.values.push(response.body.h);
           this.h = response.body.h;
-
-          if (response.body.state < 0) {
-            this.state = "disabled";
-          } else {
-            this.state = response.body.state == 0 ? "off" : "on";
-          }
-
-          if (this.values > 20) {
-            this.values = this.values.slice(1);
-          }
+          this.state = parseState(response.body.state);
+          this.values = manageHistory(this.values, response.body.history);
 
           bus.$emit("humidity:chart:update", this.values);
         },
@@ -64,10 +57,7 @@ export default {
 
     setInterval(() => {
       this.poll();
-    }, 1000 * 30);
+    }, 1000 * 10);
   }
 };
 </script>
-
-<style scoped>
-</style>

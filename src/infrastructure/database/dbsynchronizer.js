@@ -17,17 +17,18 @@ module.exports.replicateToDisk = (force) => {
     }
 
     setInterval(async () => {
-        if (!memorydb.changes) {
+        if (!memorydb.changed) {
             return;
         }
 
         await replicateToDisk();
-    }, 1000 * 60);
+    }, 1000 * 60 * 30);
 };
 
 async function replicateToDisk() {
     try {
         await memorydb.replicate.to(localstore);
+        memorydb.changed = false;
         console.log("synced in-memory db to localstore");
     } catch (ex) {
         console.log(ex);

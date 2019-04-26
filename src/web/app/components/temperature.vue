@@ -4,7 +4,7 @@
       <header>
         <h4>Temperature</h4>
         <span
-          :class="['status', state]"
+          :class="['state', state]"
           :title="state"
         ></span>
       </header>
@@ -23,11 +23,13 @@
 <script>
 import chart from "./chart.vue";
 import bus from "../bus";
+import parseState from "../utils/stateParser";
+import manageHistory from "../utils/historyManager";
 
 export default {
   data() {
     return {
-      values: [0],
+      values: [],
       state: "disabled",
       f: -1,
       c: -1
@@ -40,19 +42,10 @@ export default {
     poll() {
       this.$http.get("http://192.168.0.18:3000/api/temperature").then(
         response => {
-          this.values.push(response.body.f);
           this.f = response.body.f;
           this.c = response.body.c;
-
-          if (response.body.state < 0) {
-            this.state = "disabled";
-          } else {
-            this.state = response.body.state == 0 ? "off" : "on";
-          }
-
-          if (this.values > 20) {
-            this.values = this.values.slice(1);
-          }
+          this.state = parseState(response.body.state);
+          this.values = manageHistory(this.values, response.body.history);
 
           bus.$emit("temperature:chart:update", this.values);
         },
@@ -67,10 +60,7 @@ export default {
 
     setInterval(() => {
       this.poll();
-    }, 1000 * 30);
+    }, 1000 * 10);
   }
 };
 </script>
-
-<style scoped>
-</style>

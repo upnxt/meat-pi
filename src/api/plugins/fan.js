@@ -6,7 +6,6 @@ exports.plugin = {
     register: async function(server, options) {
         const control = options.fanController;
 
-        //status
         server.route({
             method: "GET",
             path: "/api/fan",
