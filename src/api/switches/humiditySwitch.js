@@ -17,19 +17,19 @@ class HumditySwitch {
 
             //manually disabled the control via config, return early
             if (!control.switch.enabled) {
-                this.stateManager.setOff();
+                await this.stateManager.setOff();
                 return;
             }
 
             if (value <= control.targetHumidity) {
-                await this.stateManager.setOn(() => {
-                    rpio.open(control.switch.gpio, rpio.OUTPUT, rpio.LOW);
+                await this.stateManager.setOff(() => {
+                    rpio.open(control.switch.gpio, rpio.OUTPUT, rpio.HIGH);
                 });
             }
 
             if (value > control.targetHumidity) {
-                await this.stateManager.setOff(() => {
-                    rpio.open(control.switch.gpio, rpio.OUTPUT, rpio.HIGH);
+                await this.stateManager.setOn(() => {
+                    rpio.open(control.switch.gpio, rpio.OUTPUT, rpio.LOW);
                 });
             }
 

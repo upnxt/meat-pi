@@ -12,26 +12,38 @@ exports.plugin = {
             method: "GET",
             path: "/api/humidity",
             handler: async (request, h) => {
+                const state = await control.getState();
                 const humidity = await control.getHumidity();
                 const history = await control.getHistory();
 
                 const response = {
                     h: formatHumidity(humidity),
-                    state: 1,
+                    state: state,
                     history: history
                 };
 
                 if (response.history.length > 0) {
-                    response.history = response.history.map((m) => { return { value: formatHumidity(m.value), timestamp: moment(m.timestamp).format('h:mm:ss A') }});
+                    response.history = response.history.map((m) => {
+                        return { value: formatHumidity(m.value), timestamp: m.timestamp };
+                    });
                 }
 
                 return response;
             }
         });
 
+        //update settings via querystring for now. implement ui/post later
+        server.route({
+            method: "GET",
+            path: "/api/humidity/settings",
+            handler: async (request, h) => {
+                const result = await control.update(request.query);
+                return result;
+            }
+        });
+
         function formatHumidity(humidity) {
-            if (!humidity)
-                return 0;
+            if (!humidity) return 0;
 
             return humidity.toFixed(1);
         }

@@ -10,7 +10,7 @@ class HumiditySensor {
     }
 
     async getState() {
-        var state = await this.stateManager.state();
+        const state = await this.stateManager.state();
         return state;
     }
 
@@ -28,10 +28,30 @@ class HumiditySensor {
         try {
             const control = await this.db.get(this.type);
             return control.history;
-        }
-        catch(ex) {
+        } catch (ex) {
             this.logger.log(ex);
             return [];
+        }
+    }
+
+    async update(obj) {
+        try {
+            const control = await this.db.get(this.type);
+
+            if ("enabled" in obj) {
+                control.switch.enabled = obj.enabled;
+            }
+
+            if ("targethumidity" in obj) {
+                control.targetHumidity = obj.targethumidity;
+            }
+
+            await this.db.update(control);
+
+            return true;
+        } catch (ex) {
+            this.logger.log(ex);
+            return false;
         }
     }
 
@@ -61,16 +81,19 @@ class HumiditySensor {
 
             if (control.history.length > 0) {
                 const diff = Math.abs(new Date(control.history[control.history.length - 1].timestamp) - new Date());
-                const minutes = Math.floor((diff/1000)/60);
-                if (minutes < 30)
+                const minutes = Math.floor(diff / 1000 / 60);
+                if (minutes < 30) {
                     pushHistory = false;
+                }
             }
 
-            if (pushHistory)
+            if (pushHistory) {
                 control.history.push({ value: control.value, timestamp: new Date() });
+            }
 
-            if (control.history.length > 100)
+            if (control.history.length > 100) {
                 control.history = control.history.splice(control.history.length - 100);
+            }
 
             await this.db.update(control);
             this.bus.emit("humidity:change", control.value);

@@ -8,6 +8,11 @@ class SwitchStateManager {
 
     async state() {
         const control = await this.db.get(this.type);
+
+        if (control.switch.enabled == 0) {
+            return -1;
+        }
+
         return control.switch.state;
     }
 

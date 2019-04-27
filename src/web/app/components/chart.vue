@@ -7,10 +7,13 @@ export default {
   props: ["label", "evt"],
   data: () => ({
     chartdata: {
-      labels: [""],
+      labels: [new Date()],
       datasets: [
         {
-          //   backgroundColor: "#ff0000",
+          backgroundColor: "#e6e6e6",
+          borderColor: "#cacaca",
+          pointRadius: 5,
+          pointHoverRadius: 8,
           data: [0]
         }
       ]
@@ -26,9 +29,11 @@ export default {
           {
             display: true,
             ticks: {
-              suggestedMin: 32,
-              beginAtZero: false,
-              steps: 2
+              suggestedMin: 50,
+              //   min: 0,
+              beginAtZero: false
+              //   steps: 2
+              //display: false
             },
             gridLines: {
               display: false,
@@ -38,6 +43,12 @@ export default {
         ],
         xAxes: [
           {
+            type: "time",
+            autoSkip: false,
+            time: {
+              unit: "minute"
+              //   unitStepSize: 1
+            },
             ticks: {
               display: false
             },
@@ -54,11 +65,8 @@ export default {
     this.renderChart(this.chartdata, this.options);
 
     bus.$on(this.evt, data => {
-      this.chartdata.labels = data.map(m => {
-        return m.value + this.label +", "+ m.timestamp;
-      });
-
-      this.chartdata.datasets[0].data = data.map((m) => m.value);
+      this.chartdata.labels = data.map(m => new Date(m.timestamp));
+      this.chartdata.datasets[0].data = data.map(m => m.value);
       this.$data._chart.update();
     });
   }

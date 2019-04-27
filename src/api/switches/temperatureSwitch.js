@@ -20,7 +20,7 @@ class TemperatureSwitch {
 
             //manually disabled the control via config, return early
             if (!control.switch.enabled) {
-                this.stateManager.setOff();
+                await this.stateManager.setOff();
                 return;
             }
 

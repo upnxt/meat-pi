@@ -4,7 +4,6 @@ const localstore = require("./localstore");
 module.exports.replicateToMemory = async () => {
     try {
         await localstore.replicate.to(memorydb);
-        console.log("synced localstore to in-memory db");
     } catch (ex) {
         console.log(ex);
         throw ex;

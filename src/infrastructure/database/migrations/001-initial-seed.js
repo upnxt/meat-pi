@@ -33,7 +33,7 @@ async function controlsUp() {
             history: [],
             switch: {
                 enabled: 1,
-                gpio: 3,
+                gpio: 5,
                 state: 0
             }
         });

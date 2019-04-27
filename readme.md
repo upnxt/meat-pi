@@ -37,11 +37,10 @@ Make sure the ds18b20 temperature guage has a resister from 5v to the gpio pin t
 
 # Start the site on restart of the system
 
-> nano /etc/rc.local
+> sudo nano /etc/rc.local
 
 > #start local web interface
-
-    sudo node /home/pi/scripts/temp_controller/dashboard.js &
+> sudo node /share/apps/meat-pi/src/index.js &
 
 # Start the site manually
 
