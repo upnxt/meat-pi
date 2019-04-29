@@ -7,21 +7,31 @@ Install nodejs and npm
 Install a node version manager
 
 > npm install -g n
+
+Install latest stable version of node
+
 > n lts
 
 Check to make sure n actually worked
 
 > n --version
+
 > node -v
+
 > sudo node -v
 
 The ds18b20 temperature guage is dependent on the BCM2835 library (http://www.airspayce.com/mikem/bcm2835/)
 
 > sudo apt-get install html-xml-utils
+
 > mkdir -p bcm2835 && (wget -qO - `curl -sL http://www.airspayce.com/mikem/bcm2835 | hxnormalize -x -e | hxselect -s '\n' -c "div.textblock>p:nth-child(4)>a:nth-child(1)"` | tar xz --strip-components=1 -C bcm2835 )
+
 > cd bcm2835
+
 > ./configure
+
 > make
+
 > sudo make install
 
 Add user who will run the node site(s) to the gpio group
@@ -40,6 +50,7 @@ Make sure the ds18b20 temperature guage has a resister from 5v to the gpio pin t
 > sudo nano /etc/rc.local
 
 > #start local web interface
+
 > sudo node /share/apps/meat-pi/src/index.js &
 
 # Start the site manually
