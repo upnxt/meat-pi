@@ -7,14 +7,14 @@ class FanController {
         this.stateManager = stateManager;
     }
 
-    async getState() {
-        const state = await this.stateManager.state();
+    getState() {
+        const state = this.stateManager.state();
         return state;
     }
 
-    async getHistory() {
+    getHistory() {
         try {
-            const control = await this.db.get(this.type);
+            const control = this.db.get(this.type);
             return control.history;
         } catch (ex) {
             this.logger.log(ex);
@@ -22,9 +22,9 @@ class FanController {
         }
     }
 
-    async update(obj) {
+    update(obj) {
         try {
-            const control = await this.db.get(this.type);
+            const control = this.db.get(this.type);
 
             if ("enabled" in obj) {
                 control.switch.enabled = obj.enabled;
@@ -38,7 +38,7 @@ class FanController {
                 control.runFor = obj.runinterval;
             }
 
-            await this.db.update(control);
+            this.db.update(control);
 
             return true;
         } catch (ex) {
@@ -47,32 +47,31 @@ class FanController {
         }
     }
 
-    async run() {
-        const control = await this.db.get(this.type);
+    run() {
+        const control = this.db.get(this.type);
         if (control.switch.enabled != 1) {
             return;
         }
 
         control.history.push({ value: 1, timestamp: new Date() });
-        await this.db.update(control);
-
+        this.db.update(control);
         this.bus.emit("fan:start");
 
-        setTimeout(async () => {
-            const control2 = await this.db.get(this.type);
+        setTimeout(() => {
+            const control2 = this.db.get(this.type);
             control2.history.push({ value: 0, timestamp: new Date() });
-            await this.db.update(control2);
-
+            
+            this.db.update(control2);
             this.bus.emit("fan:stop");
         }, 1000 * control.runFor);
     }
 
-    async poll() {
-        const control = await this.db.get(this.type);
-        await this.run();
+    poll() {
+        const control = this.db.get(this.type);
+        this.run();
 
-        setInterval(async () => {
-            await this.run();
+        setInterval(() => {
+            this.run();
         }, 1000 * control.runInterval);
     }
 }

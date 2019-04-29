@@ -1,11 +1,15 @@
+const logger = require("../../infrastructure/logging/logger");
 const memorydb = require("./memorydb");
 const localstore = require("./localstore");
 
 module.exports.replicateToMemory = async () => {
     try {
-        await localstore.replicate.to(memorydb);
+        const docs = await localstore.getAll();
+        memorydb.replicateFrom(docs);
+        
+        logger.log("synced localstore to in-memory db");
     } catch (ex) {
-        console.log(ex);
+        logger.log(ex);
         throw ex;
     }
 };
@@ -21,16 +25,16 @@ module.exports.replicateToDisk = (force) => {
         }
 
         await replicateToDisk();
-    }, 1000 * 60 * 30);
+    }, 1000 * 60 * 10);
 };
 
 async function replicateToDisk() {
     try {
-        await memorydb.replicate.to(localstore);
+        localstore.update(memorydb.data);
+
         memorydb.changed = false;
-        console.log("synced in-memory db to localstore");
+        logger.log("synced in-memory db to localstore");
     } catch (ex) {
-        console.log(ex);
-        throw ex;
+        logger.log(ex);
     }
 }

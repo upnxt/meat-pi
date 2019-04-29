@@ -5,14 +5,14 @@ class FanSwitch {
         this.stateManager = stateManager;
     }
 
-    async listen() {
-        this.bus.on("fan:start", async (value) => {
-            await this.stateManager.setOn();
+    listen() {
+        this.bus.on("fan:start", (value) => {
+            this.stateManager.setOn();
             this.logger.log("[switch] fan started");
         });
 
-        this.bus.on("fan:stop", async (value) => {
-            await this.stateManager.setOff();
+        this.bus.on("fan:stop", (value) => {
+            this.stateManager.setOff();
             this.logger.log("[switch] fan stopped");
         });
     }

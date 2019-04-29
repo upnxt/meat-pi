@@ -9,14 +9,14 @@ class TemperatureSensor {
         this.stateManager = stateManager;
     }
 
-    async getState() {
-        const state = await this.stateManager.state();
+    getState() {
+        const state = this.stateManager.state();
         return state;
     }
 
-    async getTemp() {
+    getTemp() {
         try {
-            const control = await this.db.get(this.type);
+            const control = this.db.get(this.type);
             return control.value;
         } catch (ex) {
             this.logger.log(ex);
@@ -24,9 +24,9 @@ class TemperatureSensor {
         }
     }
 
-    async getHistory() {
+    getHistory() {
         try {
-            const control = await this.db.get(this.type);
+            const control = this.db.get(this.type);
             return control.history;
         } catch (ex) {
             this.logger.log(ex);
@@ -34,9 +34,9 @@ class TemperatureSensor {
         }
     }
 
-    async update(obj) {
+    update(obj) {
         try {
-            const control = await this.db.get(this.type);
+            const control = this.db.get(this.type);
 
             if ("enabled" in obj) {
                 control.switch.enabled = obj.enabled;
@@ -50,7 +50,7 @@ class TemperatureSensor {
                 control.recoveryMaxTemp = obj.recoverymaxtemp;
             }
 
-            await this.db.update(control);
+            this.db.update(control);
 
             return true;
         } catch (ex) {
@@ -59,16 +59,16 @@ class TemperatureSensor {
         }
     }
 
-    async poll() {
+    poll() {
         //reset in case of failure/restart to prevent false values
-        let control = await this.db.get(this.type);
-        control.value = 0;
+        let control1 = this.db.get(this.type);
+        control1.value = 0;
 
-        await this.db.update(control);
+        this.db.update(control1);
 
         //poll
-        setInterval(async () => {
-            let control = await this.db.get(this.type);
+        setInterval(() => {
+            let control = this.db.get(this.type);
             const temp = ds18b20.temperatureSync(control.deviceId);
 
             if (temp == control.value) {
@@ -86,11 +86,15 @@ class TemperatureSensor {
                 if (minutes < 30) pushHistory = false;
             }
 
-            if (pushHistory) control.history.push({ value: control.value, timestamp: new Date() });
+            if (pushHistory) {
+                control.history.push({ value: control.value, timestamp: new Date() });
+            }
 
-            if (control.history.length > 100) control.history = control.history.splice(control.history.length - 100);
+            if (control.history.length > 100) {
+                control.history = control.history.splice(control.history.length - 100);
+            }
 
-            await this.db.update(control);
+            this.db.update(control);
             this.bus.emit("temperature:change", control.value);
         }, 1000);
     }

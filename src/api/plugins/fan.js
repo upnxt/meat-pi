@@ -11,9 +11,9 @@ exports.plugin = {
         server.route({
             method: "GET",
             path: "/api/fan",
-            handler: async (request, h) => {
-                const state = await control.getState();
-                const history = await control.getHistory();
+            handler: (request, h) => {
+                const state = control.getState();
+                const history = control.getHistory();
 
                 const response = {
                     state: state,
@@ -34,8 +34,8 @@ exports.plugin = {
         server.route({
             method: "GET",
             path: "/api/fan/settings",
-            handler: async (request, h) => {
-                const result = await control.update(request.query);
+            handler: (request, h) => {
+                const result = control.update(request.query);
                 return result;
             }
         });

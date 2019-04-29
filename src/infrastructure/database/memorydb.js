@@ -1,11 +1,37 @@
-const PouchDB = require("pouchdb-node");
-PouchDB.plugin(require("pouchdb-adapter-memory"));
+class MemoryDb {
+    constructor() {
+        this.data = [];
+        this.changed = false;
+    }
 
-const memorydb = new PouchDB("memdb", { adapter: "memory", auto_compaction: true });
-memorydb.changed = false;
-memorydb.update = async (obj) => {
-    await memorydb.put(obj);
-    memorydb.changed = true;
+    get(id) {
+        const doc = this.data.filter(m => '_id' in m && m._id == id);
+        if (doc.length <= 0) {
+            throw new Error(`unable to retrieve doc id: ${id}`);
+        }
+
+        return doc[0]
+    }
+
+    update(obj) {
+        const doc = this.get(obj._id);
+        if (!doc) {
+            this.data.push(obj);
+        }
+
+        Object.keys(obj).forEach(function(key) {
+            doc[key] = obj[key];
+        });
+
+        this.changed = true;
+        return doc;
+    }
+    
+    replicateFrom(docs) {
+        for(const doc of docs) {
+            this.data.push(doc);
+        }
+    }
 };
 
-module.exports = memorydb;
+module.exports = new MemoryDb();

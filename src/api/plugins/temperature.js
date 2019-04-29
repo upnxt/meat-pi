@@ -11,10 +11,10 @@ exports.plugin = {
         server.route({
             method: "GET",
             path: "/api/temperature",
-            handler: async (request, h) => {
-                const state = await control.getState();
-                const temp = await control.getTemp();
-                const history = await control.getHistory();
+            handler: (request, h) => {
+                const state = control.getState();
+                const temp = control.getTemp();
+                const history = control.getHistory();
 
                 const response = {
                     f: toFahrenheit(temp),
@@ -37,8 +37,8 @@ exports.plugin = {
         server.route({
             method: "GET",
             path: "/api/temperature/settings",
-            handler: async (request, h) => {
-                const result = await control.update(request.query);
+            handler: (request, h) => {
+                const result = control.update(request.query);
                 return result;
             }
         });

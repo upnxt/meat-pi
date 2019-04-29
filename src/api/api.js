@@ -2,7 +2,7 @@ const db = require("../infrastructure/database/memorydb");
 const dbsync = require("../infrastructure/database/dbsynchronizer");
 const migrations = require("../infrastructure/database/migrations/001-initial-seed");
 const bus = require("../infrastructure/events/bus");
-const ConsoleLogger = require("../infrastructure/logging/console");
+const logger = require("../infrastructure/logging/logger");
 
 //managers
 const SwitchStateManager = require("./managers/state/switchStateManager");
@@ -21,12 +21,11 @@ module.exports.init = async (server) => {
     //database seeding/syncing
     await migrations.migration_001_initial_seed();
 
-    //replicate the localstore db to the in-memory db. using in-memory as working store to minimize sdcard writes
+    //replicate the localstore data to the in-memory obj. using in-memory as working store to minimize sdcard writes
     await dbsync.replicateToMemory();
     dbsync.replicateToDisk();
 
     //wire up poor-man's DI
-    const logger = new ConsoleLogger();
     const fanStateManger = new SwitchStateManager(db, "fan");
     const fanController = new FanController(bus, db, logger, "fan", fanStateManger);
     const fanSwitch = new FanSwitch(bus, logger, fanStateManger);

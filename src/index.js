@@ -1,7 +1,11 @@
 "use strict";
 
+const path = require("path");
+const dotenv = require('dotenv');
+dotenv.config({ path: path.join(__dirname, "../.env") });
+
+const logger = require("./infrastructure/logging/logger");
 const db = require("./infrastructure/database/memorydb");
-const localstore = require("./infrastructure/database/localstore");
 const dbsync = require("./infrastructure/database/dbsynchronizer");
 
 const hapi = require("hapi");
@@ -10,8 +14,8 @@ const web = require("./web/web");
 
 const init = async () => {
     const server = hapi.server({
-        port: 3000,
-        host: "192.168.0.18"
+        port: process.env.PORT,
+        host: process.env.HOST
     });
 
     await api.init(server);
@@ -19,16 +23,13 @@ const init = async () => {
 
     await server.start();
 
-    console.log("Server running on %ss", server.info.uri);
+    logger.log(`Server running on ${server.info.uri}`);
 };
 
 process.on("unhandledRejection", async (err) => {
-    console.log(err);
+    logger.log(err);
 
     await dbsync.replicateToDisk(true);
-    db.destroy();
-    localstore.close();
-
     process.exit(1);
 });
 

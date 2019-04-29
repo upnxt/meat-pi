@@ -14,58 +14,58 @@ class TemperatureSwitch {
         this.coolingTimer = null;
     }
 
-    async listen() {
-        this.bus.on("temperature:change", async (value) => {
-            const control = await this.db.get(this.type);
+    listen() {
+        this.bus.on("temperature:change", (value) => {
+            const control = this.db.get(this.type);
 
             //manually disabled the control via config, return early
             if (!control.switch.enabled) {
-                await this.stateManager.setOff();
+                this.stateManager.setOff();
                 return;
             }
 
-            await this.recoveryTemperatureRunner(value, control);
-            await this.adaptiveTemperatureRunner(value, control);
+            this.recoveryTemperatureRunner(value, control);
+            this.adaptiveTemperatureRunner(value, control);
 
             this.logger.log(`[switch] temperature: ${value}, target: ${control.targetTemp}`);
         });
     }
 
-    async recoveryTemperatureRunner(temperature, control) {
+    recoveryTemperatureRunner(temperature, control) {
         if (temperature >= control.recoveryMaxTemp && !this.recovering) {
             this.recovering = true;
             this.clearAdaptiveTimer();
             this.turnon(control.switch.gpio);
 
-            this.logger.log(`[switch] RECOVERY STARTED. temp: ${temperature}`);
+            this.logger.log(`[switch] temperature: ${temperature}, maxtemp: ${control.recoveryMaxTemp} -- RECOVERY STARTED`);
         }
 
         if (temperature <= control.targetTemp && this.recovering) {
             this.shutoff(control.switch.gpio);
             this.recovering = false;
 
-            this.logger.log(`[switch] RECOVERY COMPLETE. temp: ${temperature}`);
+            this.logger.log(`[switch] temperature: ${temperature}, maxtemp: ${control.recoveryMaxTemp} -- RECOVERY COMPLETE`);
         }
     }
 
-    async adaptiveTemperatureRunner(temperature, control) {
+    adaptiveTemperatureRunner(temperature, control) {
         if (this.recovering) {
             return;
         }
 
         if (temperature <= control.targetTemp) {
-            await this.stateManager.setOff(() => {
-                rpio.open(this.gpio, rpio.OUTPUT, rpio.HIGH);
+            this.stateManager.setOff(() => {
+                rpio.open(control.switch.gpio, rpio.OUTPUT, rpio.HIGH);
                 this.clearAdaptiveTimer();
             });
         }
 
         //if current temp is higher than what we want, and the last temp reading was lower than the current reading, then start cooling
-        if (temperature > control.targetTemp && lastTemp < temperature) {
+        if (temperature > control.targetTemp && this.lastTemp < temperature) {
             if (!this.cooling) {
                 this.cooling = true;
 
-                await this.stateManager.setOn(() => {
+                this.stateManager.setOn(() => {
                     rpio.open(control.switch.gpio, rpio.OUTPUT, rpio.LOW);
 
                     let additionalCoolingTime = 0;
@@ -93,8 +93,9 @@ class TemperatureSwitch {
 
                     this.logger.log(`[switch] chamber cooling for: ${control.initialCoolingTimeout + additionalCoolingTime} seconds, difference: ${difference}`);
 
-                    this.coolerTimer = setTimeout(async () => {
-                        await this.shutoff(control.switch.gpio);
+                    this.coolerTimer = setTimeout(() => {
+                        this.shutoff(control.switch.gpio);
+                        this.cooling = false;
                     }, 1000 * (control.initialCoolingTimeout + additionalCoolingTime));
                 });
             }
@@ -103,14 +104,14 @@ class TemperatureSwitch {
         this.lastTemp = temperature;
     }
 
-    async turnon(gpio) {
-        await this.stateManager.setOn(() => {
+    turnon(gpio) {
+        this.stateManager.setOn(() => {
             rpio.open(gpio, rpio.OUTPUT, rpio.LOW);
         });
     }
 
-    async shutoff(gpio) {
-        await this.stateManager.setOff(() => {
+    shutoff(gpio) {
+        this.stateManager.setOff(() => {
             rpio.open(gpio, rpio.OUTPUT, rpio.HIGH);
         });
     }

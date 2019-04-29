@@ -1,4 +1,26 @@
-var PouchDB = require("pouchdb-node");
+const fs = require("mz/fs");
+const path = require("path");
 
-var localstore = new PouchDB("./data.db", { auto_compaction: true });
-module.exports = localstore;
+class LocalStore {
+    constructor() {
+        this.localstore_path = path.join(__dirname, "../../../data/data.json");
+        console.log(this.localstore_path)
+    }
+
+    async getAll() {
+        const data = await fs.readFile(this.localstore_path, "utf8");
+        if (!data || data.trim() == "") {
+            return null;
+        }
+
+        const docs = JSON.parse(data);
+        return docs;
+    }
+
+    async update(docs) {
+        const json = JSON.stringify(docs);
+        await fs.writeFile(this.localstore_path, json, 'utf8');
+    }
+}
+
+module.exports = new LocalStore();

@@ -6,8 +6,8 @@ class SwitchStateManager {
         this.type = type;
     }
 
-    async state() {
-        const control = await this.db.get(this.type);
+    state() {
+        const control = this.db.get(this.type);
 
         if (control.switch.enabled == 0) {
             return -1;
@@ -16,19 +16,19 @@ class SwitchStateManager {
         return control.switch.state;
     }
 
-    async setOn(callback) {
-        await this.set(1, callback);
+    setOn(callback) {
+        this.set(1, callback);
     }
 
-    async setOff(callback) {
-        await this.set(0, callback);
+    setOff(callback) {
+        this.set(0, callback);
     }
 
-    async set(state, callback) {
-        let control = await this.db.get(this.type);
+    set(state, callback) {
+        let control = this.db.get(this.type);
         control.switch.state = state;
 
-        await this.db.update(control);
+        this.db.update(control);
 
         if (typeof callback === "function") {
             callback();

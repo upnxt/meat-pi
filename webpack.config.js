@@ -7,7 +7,7 @@ module.exports = {
     //chunk up app
     entry: {
         app: "./src/web/app/app.js",
-        vendor: ["theme", "vue", "vue-resource"]
+        vendor: ["theme", "vue", "vue-resource", "vue-chartjs"]
     },
     output: {
         path: path.resolve(__dirname, "./public"),
@@ -70,6 +70,7 @@ module.exports = {
         alias: {
             vue$: "vue/dist/vue.min.js",
             "vue-resource": "vue-resource/dist/vue-resource.min.js",
+            "vue-chartjs": "vue-chartjs/dist/vue-chartjs.min.js",
             theme: "./src/web/less/theme.js"
         },
         extensions: ["*", ".js", ".vue", ".json"]

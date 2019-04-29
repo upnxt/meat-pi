@@ -60,7 +60,7 @@ export default {
 
     setInterval(() => {
       this.poll();
-    }, 1000 * 10);
+    }, 1000 * 5);
   }
 };
 </script>

@@ -9,14 +9,14 @@ class HumiditySensor {
         this.stateManager = stateManager;
     }
 
-    async getState() {
-        const state = await this.stateManager.state();
+    getState() {
+        const state = this.stateManager.state();
         return state;
     }
 
-    async getHumidity() {
+    getHumidity() {
         try {
-            const control = await this.db.get(this.type);
+            const control = this.db.get(this.type);
             return control.value;
         } catch (ex) {
             this.logger.log(ex);
@@ -24,9 +24,9 @@ class HumiditySensor {
         }
     }
 
-    async getHistory() {
+    getHistory() {
         try {
-            const control = await this.db.get(this.type);
+            const control = this.db.get(this.type);
             return control.history;
         } catch (ex) {
             this.logger.log(ex);
@@ -34,9 +34,9 @@ class HumiditySensor {
         }
     }
 
-    async update(obj) {
+    update(obj) {
         try {
-            const control = await this.db.get(this.type);
+            const control = this.db.get(this.type);
 
             if ("enabled" in obj) {
                 control.switch.enabled = obj.enabled;
@@ -46,7 +46,7 @@ class HumiditySensor {
                 control.targetHumidity = obj.targethumidity;
             }
 
-            await this.db.update(control);
+            this.db.update(control);
 
             return true;
         } catch (ex) {
@@ -55,16 +55,16 @@ class HumiditySensor {
         }
     }
 
-    async poll() {
+    poll() {
         //reset in case of failure/restart to prevent false values
-        let control = await this.db.get(this.type);
-        control.value = 0;
+        let control1 = this.db.get(this.type);
+        control1.value = 0;
 
-        await this.db.update(control);
+        this.db.update(control1);
 
         //dht22 doesn't update very often, poll at a minimum of every 5 seconds
-        setInterval(async () => {
-            let control = await this.db.get(this.type);
+        setInterval(() => {
+            let control = this.db.get(this.type);
 
             const dht = new sensor.DHT22(control.gpio);
             const readout = dht.read();
@@ -95,7 +95,7 @@ class HumiditySensor {
                 control.history = control.history.splice(control.history.length - 100);
             }
 
-            await this.db.update(control);
+            this.db.update(control);
             this.bus.emit("humidity:change", control.value);
         }, 1000 * 3);
     }
