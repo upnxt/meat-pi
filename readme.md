@@ -1,3 +1,14 @@
+# What is this?
+Meat Pi is a controller/api/web site built to help control meat curing and home brew chamber conditions. Internal chamber conditions are continously monitored via temperature and humidity sensors and power is toggled on/off to the chamber (freezer/fridge/dehumidifier) depending on the sensor readouts and the configuration settings that have been set.
+
+This is more of an example project than anything for most people. Feel free to fork, I have no intentions of maintaining this on any regular basis.
+
+# Required equipment
+1. Raspberry Pi
+2. ds18b20 temperature sensor
+3. dht22 humidity sensor
+4. 3 relays
+
 # Dependency setup
 
 Install nodejs and npm
