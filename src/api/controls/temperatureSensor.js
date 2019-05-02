@@ -39,15 +39,23 @@ class TemperatureSensor {
             const control = this.db.get(this.type);
 
             if ("enabled" in obj) {
-                control.switch.enabled = obj.enabled;
+                control.switch.enabled = parseInt(obj.enabled);
             }
 
             if ("targettemp" in obj) {
-                control.targetTemp = obj.targettemp;
+                control.targetTemp = parseFloat(obj.targettemp);
             }
 
             if ("recoverymaxtemp" in obj) {
-                control.recoveryMaxTemp = obj.recoverymaxtemp;
+                control.recoveryMaxTemp = parseFloat(obj.recoverymaxtemp);
+            }
+
+            if ("initialcoolingtimeout" in obj) {
+                control.initialCoolingTimeout = parseInt(obj.initialcoolingtimeout);
+            }
+
+            if ("residualcoolingmultiplier" in obj) {
+                control.residualCoolingMultiplier = parseFloat(obj.residualcoolingmultiplier);
             }
 
             this.db.update(control);
@@ -61,14 +69,14 @@ class TemperatureSensor {
 
     poll() {
         //reset in case of failure/restart to prevent false values
-        let control1 = this.db.get(this.type);
+        const control1 = this.db.get(this.type);
         control1.value = 0;
 
         this.db.update(control1);
 
         //poll
         setInterval(() => {
-            let control = this.db.get(this.type);
+            const control = this.db.get(this.type);
             const temp = ds18b20.temperatureSync(control.deviceId);
 
             if (temp == control.value) {
@@ -83,18 +91,26 @@ class TemperatureSensor {
             if (control.history.length > 0) {
                 const diff = Math.abs(new Date(control.history[control.history.length - 1].timestamp) - new Date());
                 const minutes = Math.floor(diff / 1000 / 60);
-                if (minutes < 30) pushHistory = false;
+                if (minutes < control.historyInterval) {
+                    pushHistory = false;
+                }
             }
 
             if (pushHistory) {
                 control.history.push({ value: control.value, timestamp: new Date() });
             }
 
-            if (control.history.length > 100) {
-                control.history = control.history.splice(control.history.length - 100);
+            if (control.history.length > control.historyLimit) {
+                control.history = control.history.splice(control.history.length - control.historyLimit);
             }
 
             this.db.update(control);
+
+            if (control1.switch.enabled != 1) {
+                this.bus.emit("temperature:forceoff");
+                return;
+            }
+
             this.bus.emit("temperature:change", control.value);
         }, 1000);
     }

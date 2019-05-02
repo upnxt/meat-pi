@@ -1,35 +1,21 @@
 "use strict";
 
-const moment = require("moment");
-
 exports.plugin = {
     name: "humidityPlugin",
     version: "1.0.0",
     register: async function(server, options) {
         const control = options.humiditySensor;
 
-        server.route({
-            method: "GET",
-            path: "/api/humidity",
-            handler: (request, h) => {
-                const state = control.getState();
-                const humidity = control.getHumidity();
-                const history = control.getHistory();
+        options.sockets.on("connection", function(socket) {
+            socket.on("humidity:init", () => {
+                const response = getHumidity();
+                socket.emit("humidity:poll", response);
+            });
 
-                const response = {
-                    h: formatHumidity(humidity),
-                    state: state,
-                    history: history
-                };
-
-                if (response.history.length > 0) {
-                    response.history = response.history.map((m) => {
-                        return { value: formatHumidity(m.value), timestamp: m.timestamp };
-                    });
-                }
-
-                return response;
-            }
+            options.bus.on("humidity:change", () => {
+                const response = getHumidity();
+                socket.emit("humidity:poll", response);
+            });
         });
 
         //update settings via querystring for now. implement ui/post later
@@ -42,12 +28,32 @@ exports.plugin = {
             }
         });
 
+        function getHumidity() {
+            const state = control.getState();
+            const humidity = control.getHumidity();
+            const history = control.getHistory();
+
+            const response = {
+                h: formatHumidity(humidity),
+                state: state,
+                history: history
+            };
+
+            if (response.history.length > 0) {
+                response.history = response.history.map((m) => {
+                    return { value: formatHumidity(m.value), timestamp: m.timestamp };
+                });
+            }
+
+            return response;
+        }
+
         function formatHumidity(humidity) {
             if (!humidity) {
                 return 0;
             }
 
-            return humidity.toFixed(1);
+            return parseFloat(humidity).toFixed(1);
         }
     }
 };

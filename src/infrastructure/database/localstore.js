@@ -4,7 +4,6 @@ const path = require("path");
 class LocalStore {
     constructor() {
         this.localstore_path = path.join(__dirname, "../../../data/data.json");
-        console.log(this.localstore_path)
     }
 
     async getAll() {
@@ -19,7 +18,7 @@ class LocalStore {
 
     async update(docs) {
         const json = JSON.stringify(docs);
-        await fs.writeFile(this.localstore_path, json, 'utf8');
+        await fs.writeFile(this.localstore_path, json, "utf8");
     }
 }
 

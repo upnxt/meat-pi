@@ -27,15 +27,15 @@ class FanController {
             const control = this.db.get(this.type);
 
             if ("enabled" in obj) {
-                control.switch.enabled = obj.enabled;
+                control.switch.enabled = parseInt(obj.enabled);
             }
 
             if ("runfor" in obj) {
-                control.runFor = obj.runfor;
+                control.runFor = parseInt(obj.runfor);
             }
 
             if ("runinterval" in obj) {
-                control.runFor = obj.runinterval;
+                control.runFor = parseInt(obj.runinterval);
             }
 
             this.db.update(control);
@@ -60,7 +60,7 @@ class FanController {
         setTimeout(() => {
             const control2 = this.db.get(this.type);
             control2.history.push({ value: 0, timestamp: new Date() });
-            
+
             this.db.update(control2);
             this.bus.emit("fan:stop");
         }, 1000 * control.runFor);

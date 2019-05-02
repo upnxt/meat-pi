@@ -1,3 +1,4 @@
+const socket = require("socket.io");
 const db = require("../infrastructure/database/memorydb");
 const dbsync = require("../infrastructure/database/dbsynchronizer");
 const migrations = require("../infrastructure/database/migrations/001-initial-seed");
@@ -48,10 +49,14 @@ module.exports.init = async (server) => {
     await humiditySensor.poll();
     await temperatureSensor.poll();
 
+    const sockets = socket(server.listener);
+
     //api routes
     await server.register({
         plugin: require("./plugins/fan"),
         options: {
+            sockets: sockets,
+            bus: bus,
             fanController: fanController
         }
     });
@@ -59,6 +64,8 @@ module.exports.init = async (server) => {
     await server.register({
         plugin: require("./plugins/humidity"),
         options: {
+            sockets: sockets,
+            bus: bus,
             humiditySensor: humiditySensor
         }
     });
@@ -66,6 +73,8 @@ module.exports.init = async (server) => {
     await server.register({
         plugin: require("./plugins/temperature"),
         options: {
+            sockets: sockets,
+            bus: bus,
             temperatureSensor: temperatureSensor
         }
     });

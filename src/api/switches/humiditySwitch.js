@@ -15,25 +15,32 @@ class HumditySwitch {
         this.bus.on("humidity:change", (value) => {
             const control = this.db.get(this.type);
 
-            //manually disabled the control via config, return early
-            if (!control.switch.enabled) {
-                this.stateManager.setOff();
-                return;
-            }
-
             if (value <= control.targetHumidity) {
-                this.stateManager.setOff(() => {
-                    rpio.open(control.switch.gpio, rpio.OUTPUT, rpio.HIGH);
-                });
+                this.turnoff(control.switch.gpio);
             }
 
             if (value > control.targetHumidity) {
-                this.stateManager.setOn(() => {
-                    rpio.open(control.switch.gpio, rpio.OUTPUT, rpio.LOW);
-                });
+                this.turnon(control.switch.gpio);
             }
 
             this.logger.log(`[switch] humidity: ${value}, target: ${control.targetHumidity}, state: ${this.stateManager.state()}`);
+        });
+
+        this.bus.on("humidity:forceoff", () => {
+            const control = this.db.get(this.type);
+            this.turnoff(control.switch.gpio);
+        });
+    }
+
+    turnon(gpio) {
+        this.stateManager.setOn(() => {
+            rpio.open(gpio, rpio.OUTPUT, rpio.LOW);
+        });
+    }
+
+    turnoff(gpio) {
+        this.stateManager.setOff(() => {
+            rpio.open(gpio, rpio.OUTPUT, rpio.HIGH);
         });
     }
 }

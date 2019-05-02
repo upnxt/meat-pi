@@ -1,7 +1,7 @@
 "use strict";
 
 const path = require("path");
-const dotenv = require('dotenv');
+const dotenv = require("dotenv");
 dotenv.config({ path: path.join(__dirname, "../.env") });
 
 const logger = require("./infrastructure/logging/logger");

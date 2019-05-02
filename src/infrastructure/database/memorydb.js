@@ -5,12 +5,12 @@ class MemoryDb {
     }
 
     get(id) {
-        const doc = this.data.filter(m => '_id' in m && m._id == id);
+        const doc = this.data.filter((m) => "_id" in m && m._id == id);
         if (doc.length <= 0) {
             throw new Error(`unable to retrieve doc id: ${id}`);
         }
 
-        return doc[0]
+        return doc[0];
     }
 
     update(obj) {
@@ -26,12 +26,12 @@ class MemoryDb {
         this.changed = true;
         return doc;
     }
-    
+
     replicateFrom(docs) {
-        for(const doc of docs) {
+        for (const doc of docs) {
             this.data.push(doc);
         }
     }
-};
+}
 
 module.exports = new MemoryDb();

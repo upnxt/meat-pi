@@ -1,23 +1,24 @@
 <template>
-  <section class="control">
-    <div class="reading">
-      <header>
-        <h4>Temperature</h4>
-        <span
-          :class="['state', state]"
-          :title="state"
-        ></span>
-      </header>
-      <h1>{{f}}<sup>&deg;F</sup></h1>
-      <footer>{{c}}<sup>&deg;C</sup></footer>
-    </div>
-    <div class="chart">
-      <chart
-        label="F"
-        evt="temperature:chart:update"
-      />
-    </div>
-  </section>
+    <section class="control">
+        <div class="reading">
+            <header>
+                <h4>Temperature</h4>
+                <span
+                    :class="['state', state]"
+                    :title="state"
+                ></span>
+            </header>
+            <h1>{{f}}<sup>&deg;F</sup></h1>
+            <footer>{{c}}<sup>&deg;C</sup></footer>
+        </div>
+        <div class="chart">
+            <chart
+                label="F"
+                step="1"
+                evt="temperature:chart:update"
+            />
+        </div>
+    </section>
 </template>
 
 <script>
@@ -27,40 +28,31 @@ import parseState from "../utils/stateParser";
 import manageHistory from "../utils/historyManager";
 
 export default {
-  data() {
-    return {
-      values: [],
-      state: "disabled",
-      f: -1,
-      c: -1
-    };
-  },
-  components: {
-    chart
-  },
-  methods: {
-    poll() {
-      this.$http.get("http://192.168.0.18:3000/api/temperature").then(
-        response => {
-          this.f = response.body.f;
-          this.c = response.body.c;
-          this.state = parseState(response.body.state);
-          this.values = manageHistory(this.values, response.body.history);
+    props: ["socket"],
+    data() {
+        return {
+            values: [],
+            state: "disabled",
+            f: -1,
+            c: -1
+        };
+    },
+    components: {
+        chart
+    },
+    mounted() {
+        this.$parent.$on("socket:registered", socket => {
+            socket.emit("temperature:init");
 
-          bus.$emit("temperature:chart:update", this.values);
-        },
-        err => {
-          console.log(err);
-        }
-      );
+            socket.on("temperature:poll", response => {
+                this.f = response.f;
+                this.c = response.c;
+                this.state = parseState(response.state);
+                this.values = manageHistory(this.values, response.history);
+
+                bus.$emit("temperature:chart:update", this.values);
+            });
+        });
     }
-  },
-  mounted() {
-    this.poll();
-
-    setInterval(() => {
-      this.poll();
-    }, 1000 * 5);
-  }
 };
 </script>

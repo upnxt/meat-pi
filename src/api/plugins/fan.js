@@ -8,10 +8,8 @@ exports.plugin = {
     register: async function(server, options) {
         const control = options.fanController;
 
-        server.route({
-            method: "GET",
-            path: "/api/fan",
-            handler: (request, h) => {
+        options.sockets.on("connection", function(socket) {
+            setInterval(() => {
                 const state = control.getState();
                 const history = control.getHistory();
 
@@ -26,8 +24,8 @@ exports.plugin = {
                     });
                 }
 
-                return response;
-            }
+                socket.emit("fan:poll", response);
+            }, 1000 * 5);
         });
 
         //update settings via querystring for now. implement ui/post later
